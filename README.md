@@ -1,23 +1,24 @@
-# Bonzai™ Sample `foo` Command (Template)
-
-*Create a new GitHub project using this template and change this
-README.md to match your project. Make all your template changes before
-making your first commit.*
+# Common Twitch Commands, a Bonzai Branch
 
 ![WIP](https://img.shields.io/badge/status-wip-red)
-![Go Version](https://img.shields.io/github/go-mod/go-version/rwxrob/foo)
-[![GoDoc](https://godoc.org/github.com/rwxrob/foo?status.svg)](https://godoc.org/github.com/rwxrob/foo)
+![Go
+Version](https://img.shields.io/github/go-mod/go-version/rwxrob/twitch)
+[![GoDoc](https://godoc.org/github.com/rwxrob/twitch?status.svg)](https://godoc.org/github.com/rwxrob/twitch)
 [![License](https://img.shields.io/badge/license-Apache2-brightgreen.svg)](LICENSE)
+
+This command is constantly under revision while I work on it. Don't plan
+on anything stable until it hits `v1.0`.
 
 ## Install
 
-This command can be installed as a standalone program or composed into 
-a Bonzai command tree.
+This command can be installed as a standalone program (less preferred)
+or composed into a Bonzai command tree (more preferred to avoid conflict
+with the official `twitch` executable maintained by the Twitch company)
 
 Standalone
 
 ```
-go install github.com/rwxrob/foo/foo@latest
+go install github.com/rwxrob/twitch/twitch@latest
 ```
 
 Composed
@@ -27,12 +28,12 @@ package cmds
 
 import (
 	"github.com/rwxrob/bonzai"
-	"github.com/rwxrob/foo"
+	"github.com/rwxrob/twitch"
 )
 
 var Cmd = &bonzai.Cmd{
 	Name:     `cmds`,
-	Commands: []*bonzai.Cmd{help.Cmd, foo.Cmd},
+	Commands: []*bonzai.Cmd{help.Cmd, twitch.Cmd},
 }
 ```
 
@@ -43,7 +44,7 @@ To activate bash completion just use the `complete -C` option from your
 completion is done by the program itself.
 
 ```
-complete -C foo foo
+complete -C twitch twitch
 ```
 
 If you don't have bash or tab completion check use the shortcut
