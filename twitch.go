@@ -2,11 +2,12 @@ package twitch
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/rwxrob/bonzai"
 	"github.com/rwxrob/bonzai/inc/help"
+	"github.com/rwxrob/fs/file"
+	yq "github.com/rwxrob/yq/pkg"
 )
 
 var Cmd = &bonzai.Cmd{
@@ -23,11 +24,7 @@ var chat = &bonzai.Cmd{
 	Name:    `chat`,
 	Summary: `sends all arguments as a single string to Twitch chat`,
 	Call: func(x *bonzai.Cmd, args ...string) error {
-		// TODO read from stdin if no arguments
-		if len(args) < 1 {
-			return fmt.Errorf("empty chat message, need some arguments")
-		}
-		msg := strings.Join(args, " ")
+		msg := bonzai.ArgsOrIn(args)
 		// FIXME: don't depend on command line `chat` program
 		return bonzai.Exec([]string{"chat", msg}...)
 	},
@@ -43,7 +40,7 @@ var commands = &bonzai.Cmd{
 	Name:     `commands`,
 	Summary:  `update and list Twitch Streamlabs Cloudbot commands`,
 	Aliases:  []string{"c", "cmd"},
-	Commands: []*bonzai.Cmd{help.Cmd, add, edit, list, remove},
+	Commands: []*bonzai.Cmd{help.Cmd, add, edit, list, remove, _file},
 }
 
 var add = &bonzai.Cmd{
@@ -93,6 +90,19 @@ var edit = &bonzai.Cmd{
 	},
 }
 
+var _file = &bonzai.Cmd{
+	Name:    `file`,
+	Params:  []string{"edit"},
+	Summary: `print the full path to commands file from configuration`,
+	Call: func(x *bonzai.Cmd, args ...string) error {
+		if len(args) > 0 && args[0] == "edit" {
+			file.Edit(x.Caller.Q("file"))
+		}
+		fmt.Println(x.Caller.Q("file"))
+		return nil
+	},
+}
+
 var list = &bonzai.Cmd{
 	Name:    `list`,
 	Summary: `list existing commands from commands.yaml`,
@@ -102,8 +112,6 @@ var list = &bonzai.Cmd{
 		if path == "" {
 			return x.Caller.MissingConfig("file")
 		}
-		log.Printf("would lookup %v", path)
-		// TODO look into yq for this lookup
-		return nil
+		return yq.Evaluate("keys", path)
 	},
 }
