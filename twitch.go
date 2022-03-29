@@ -2,11 +2,13 @@ package twitch
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/rwxrob/bonzai"
 	"github.com/rwxrob/bonzai/inc/help"
 	"github.com/rwxrob/fs/file"
+	"github.com/rwxrob/to"
 	yq "github.com/rwxrob/yq/pkg"
 )
 
@@ -40,7 +42,7 @@ var commands = &bonzai.Cmd{
 	Name:     `commands`,
 	Summary:  `update and list Twitch Streamlabs Cloudbot commands`,
 	Aliases:  []string{"c", "cmd"},
-	Commands: []*bonzai.Cmd{help.Cmd, add, edit, list, remove, _file},
+	Commands: []*bonzai.Cmd{help.Cmd, add, edit, list, remove, _file, sync},
 }
 
 var add = &bonzai.Cmd{
@@ -90,6 +92,26 @@ var edit = &bonzai.Cmd{
 	},
 }
 
+var sync = &bonzai.Cmd{
+	Name:    `sync`,
+	Summary: `sync a command from YAML file to Twitch`,
+	Usage:   `<command>`,
+	Call: func(x *bonzai.Cmd, args ...string) error {
+		if len(args) < 1 {
+			return x.UsageError()
+		}
+		path := x.Caller.Q("file")
+		if path == "" {
+			return x.Caller.MissingConfig("file")
+		}
+		msg, err := yq.EvaluateToString("."+args[0], path)
+		if err != nil {
+			return err
+		}
+		return edit.Call(x, args[0], msg)
+	},
+}
+
 var _file = &bonzai.Cmd{
 	Name:    `file`,
 	Params:  []string{"edit"},
@@ -112,6 +134,15 @@ var list = &bonzai.Cmd{
 		if path == "" {
 			return x.Caller.MissingConfig("file")
 		}
-		return yq.Evaluate("keys", path)
+		buf, err := yq.EvaluateToString("keys", path)
+		if err != nil {
+			return err
+		}
+		lines := to.Lines(buf)
+		sort.Strings(lines)
+		buf = strings.Join(lines, " !")
+		buf = strings.Replace(buf, "- ", "", -1)
+		fmt.Println("!" + buf)
+		return nil
 	},
 }
