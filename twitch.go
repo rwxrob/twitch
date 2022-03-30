@@ -96,10 +96,8 @@ var sync = &bonzai.Cmd{
 	Name:    `sync`,
 	Summary: `sync a command from YAML file to Twitch`,
 	Usage:   `<command>`,
+	MinArgs: 1,
 	Call: func(x *bonzai.Cmd, args ...string) error {
-		if len(args) < 1 {
-			return x.UsageError()
-		}
 		path := x.Caller.Q("file")
 		if path == "" {
 			return x.Caller.MissingConfig("file")
@@ -108,6 +106,10 @@ var sync = &bonzai.Cmd{
 		if err != nil {
 			return err
 		}
+		if len(msg) >= 380 {
+			return fmt.Errorf("Twitch commands must be 380 bytes or less")
+		}
+		x.Log("Message body length: %v", len(msg))
 		return edit.Call(x, args[0], msg)
 	},
 }
