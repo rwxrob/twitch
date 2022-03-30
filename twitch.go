@@ -62,10 +62,10 @@ var commit = &Z.Cmd{
 		if err := os.Chdir(path); err != nil {
 			return err
 		}
-		Z.Run(
+		Z.Exec(
 			"git", "commit", "commands.yaml", "-m", "Update twitch/commands.yaml",
 		)
-		Z.Run("git", "push")
+		Z.Exec("git", "push")
 		return nil
 	},
 }
