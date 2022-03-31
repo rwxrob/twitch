@@ -130,7 +130,7 @@ var sync = &Z.Cmd{
 			return err
 		}
 		if len(msg) >= 380 {
-			return fmt.Errorf("Twitch commands must be 380 bytes or less")
+			return fmt.Errorf("Must be 380 bytes or less (currently %v)", len(msg))
 		}
 		x.Log("Message body length: %v", len(msg))
 		return edit.Call(x, args[0], msg)
