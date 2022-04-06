@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/mikefarah/yq/v4 v4.24.2
-	github.com/rwxrob/bonzai v0.1.0
+	github.com/rwxrob/bonzai v0.1.2
 	github.com/rwxrob/fs v0.4.4
 	github.com/rwxrob/to v0.4.5
-	github.com/rwxrob/yq v0.2.1
+	github.com/rwxrob/yq v0.2.2
 )
 
 require (
@@ -26,7 +26,7 @@ require (
 	github.com/rwxrob/scan v0.6.1 // indirect
 	github.com/rwxrob/structs v0.5.1 // indirect
 	github.com/rwxrob/term v0.2.3 // indirect
-	github.com/rwxrob/y2j v0.3.2 // indirect
+	github.com/rwxrob/y2j v0.3.3 // indirect
 	github.com/timtadh/data-structures v0.5.3 // indirect
 	github.com/timtadh/lexmachine v0.2.2 // indirect
 	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29 // indirect
