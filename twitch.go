@@ -10,6 +10,7 @@ import (
 	"github.com/rwxrob/bonzai/help"
 	Z "github.com/rwxrob/bonzai/z"
 	"github.com/rwxrob/fs/file"
+	"github.com/rwxrob/term"
 	"github.com/rwxrob/to"
 	yq "github.com/rwxrob/yq/pkg"
 )
@@ -24,13 +25,22 @@ var Cmd = &Z.Cmd{
 	Commands:  []*Z.Cmd{help.Cmd, bot, chat},
 }
 
+func sendChat(msg string) error {
+	return Z.Exec([]string{"chat", msg}...)
+}
+
 var chat = &Z.Cmd{
 	Name:    `chat`,
 	Summary: `sends all arguments as a single string to Twitch chat`,
-	Call: func(x *Z.Cmd, args ...string) error {
-		msg := Z.ArgsOrIn(args)
-		// FIXME: don't depend on command line `chat` program
-		return Z.Exec([]string{"chat", msg}...)
+	Call: func(_ *Z.Cmd, args ...string) error {
+		if len(args) == 0 {
+			term.REPL(
+				func(a string) string { return "" },
+				func(a string) string { sendChat(a); return "" },
+			)
+		}
+		msg := strings.Join(args, " ")
+		return sendChat(msg)
 	},
 }
 

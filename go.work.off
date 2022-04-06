@@ -1,0 +1,15 @@
+go 1.19
+
+use (
+	.
+	../bonzai
+	../config
+	../fn
+	../fs
+	../scan
+	../term
+	../to
+	../uniq
+	../y2j
+	../yq
+)
