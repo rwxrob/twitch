@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	Z "github.com/rwxrob/bonzai"
-	"github.com/rwxrob/bonzai/inc/help"
+	"github.com/rwxrob/bonzai/help"
+	Z "github.com/rwxrob/bonzai/z"
 	"github.com/rwxrob/fs/file"
 	"github.com/rwxrob/to"
 	yq "github.com/rwxrob/yq/pkg"
@@ -129,7 +129,7 @@ var sync = &Z.Cmd{
 		if err != nil {
 			return err
 		}
-		if len(msg) >= 380 {
+		if len(msg) > 380 {
 			return fmt.Errorf("Must be 380 bytes or less (currently %v)", len(msg))
 		}
 		x.Log("Message body length: %v", len(msg))
@@ -144,6 +144,7 @@ var _file = &Z.Cmd{
 	Call: func(x *Z.Cmd, args ...string) error {
 		if len(args) > 0 && args[0] == "edit" {
 			file.Edit(x.Caller.Q("file"))
+			return commit.Call(x, args...)
 		}
 		fmt.Println(x.Caller.Q("file"))
 		return nil
