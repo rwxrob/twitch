@@ -19,7 +19,7 @@ var Cmd = &Z.Cmd{
 
 	Name:      `twitch`,
 	Summary:   `collection of twitch helper commands`,
-	Version:   `v0.0.1`,
+	Version:   `v0.2.8`,
 	Copyright: `Copyright 2021 Robert S Muhlestein`,
 	License:   `Apache-2.0`,
 	Commands:  []*Z.Cmd{help.Cmd, bot, chat},
