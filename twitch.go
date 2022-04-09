@@ -19,7 +19,7 @@ var Cmd = &Z.Cmd{
 
 	Name:      `twitch`,
 	Summary:   `collection of twitch helper commands`,
-	Version:   `v0.2.8`,
+	Version:   `v0.3.0`,
 	Copyright: `Copyright 2021 Robert S Muhlestein`,
 	License:   `Apache-2.0`,
 	Commands:  []*Z.Cmd{help.Cmd, bot, chat},
@@ -82,15 +82,16 @@ var commit = &Z.Cmd{
 
 var add = &Z.Cmd{
 	Name:    `add`,
-	Summary: `add (or update) a command with !addcommand`,
-	Usage:   `<command> <body>`,
+	Summary: `add a command by name from file`,
+	Usage:   `<name>`,
+	MinArgs: 1,
 	Aliases: []string{"a"},
 	Call: func(x *Z.Cmd, args ...string) error {
-		if len(args) < 2 {
-			return x.UsageError()
+		if err := chat.Call(x,
+			[]string{"!addcommand", args[0], "some"}...); err != nil {
+			return err
 		}
-		msg := strings.Join(args[1:], " ")
-		return chat.Call(x, []string{"!addcommand", args[0], msg}...)
+		return sync.Call(x, args[0])
 	},
 }
 
@@ -156,7 +157,7 @@ var _file = &Z.Cmd{
 			file.Edit(x.Caller.Q("file"))
 			return commit.Call(x, args...)
 		}
-		fmt.Println(x.Caller.Q("file"))
+		fmt.Print(x.Caller.Q("file"))
 		return nil
 	},
 }
