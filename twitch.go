@@ -63,7 +63,7 @@ var commit = &Z.Cmd{
 	Name:    `commit`,
 	Summary: `commit the commands.yaml file`,
 	Call: func(x *Z.Cmd, args ...string) error {
-		path := x.Caller.Q("file")
+		path := x.Caller.C("file")
 		if path == "" {
 			return x.Caller.MissingConfig("file")
 		}
@@ -132,7 +132,7 @@ var sync = &Z.Cmd{
 	Usage:   `<command>`,
 	MinArgs: 1,
 	Call: func(x *Z.Cmd, args ...string) error {
-		path := x.Caller.Q("file")
+		path := x.Caller.C("file")
 		if path == "" {
 			return x.Caller.MissingConfig("file")
 		}
@@ -154,10 +154,10 @@ var _file = &Z.Cmd{
 	Summary: `print the full path to commands file from configuration`,
 	Call: func(x *Z.Cmd, args ...string) error {
 		if len(args) > 0 && args[0] == "edit" {
-			file.Edit(x.Caller.Q("file"))
+			file.Edit(x.Caller.C("file"))
 			return commit.Call(x, args...)
 		}
-		fmt.Print(x.Caller.Q("file"))
+		fmt.Print(x.Caller.C("file"))
 		return nil
 	},
 }
@@ -167,7 +167,7 @@ var list = &Z.Cmd{
 	Summary: `list existing commands from commands.yaml`,
 	Aliases: []string{"l"},
 	Call: func(x *Z.Cmd, _ ...string) error {
-		path := x.Caller.Q("file")
+		path := x.Caller.C("file")
 		if path == "" {
 			return x.Caller.MissingConfig("file")
 		}
