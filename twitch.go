@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	Z "github.com/rwxrob/bonzai/z"
+	"github.com/rwxrob/conf"
 	"github.com/rwxrob/fs/file"
 	"github.com/rwxrob/help"
 	"github.com/rwxrob/term"
@@ -19,10 +20,10 @@ var Cmd = &Z.Cmd{
 
 	Name:      `twitch`,
 	Summary:   `collection of twitch helper commands`,
-	Version:   `v0.3.1`,
+	Version:   `v0.3.2`,
 	Copyright: `Copyright 2021 Robert S Muhlestein`,
 	License:   `Apache-2.0`,
-	Commands:  []*Z.Cmd{help.Cmd, bot, chat},
+	Commands:  []*Z.Cmd{help.Cmd, conf.Cmd, bot, chat},
 }
 
 func sendChat(msg string) error {
@@ -47,7 +48,7 @@ var chat = &Z.Cmd{
 var bot = &Z.Cmd{
 	Name:     `bot`,
 	Summary:  `bot-related commands`,
-	Commands: []*Z.Cmd{help.Cmd, commands},
+	Commands: []*Z.Cmd{help.Cmd, conf.Cmd, commands},
 }
 
 var commands = &Z.Cmd{
@@ -55,17 +56,18 @@ var commands = &Z.Cmd{
 	Summary: `update and list Twitch Streamlabs Cloudbot commands`,
 	Aliases: []string{"c", "cmd"},
 	Commands: []*Z.Cmd{
-		help.Cmd, add, edit, list, remove, _file, sync, commit,
+		help.Cmd, add, edit, list, remove, filecmd, sync, commit,
 	},
 }
 
 var commit = &Z.Cmd{
-	Name:    `commit`,
-	Summary: `commit the commands.yaml file`,
+	Name:     `commit`,
+	Summary:  `commit the commands.yaml file`,
+	Commands: []*Z.Cmd{help.Cmd},
 	Call: func(x *Z.Cmd, args ...string) error {
-		path := x.Caller.C("file")
-		if path == "" {
-			return x.Caller.MissingConfig("file")
+		path, err := x.Caller.C("file")
+		if err != nil {
+			return err
 		}
 		path = filepath.Dir(path)
 		x.Log("Changing to directory: %v", path)
@@ -81,11 +83,12 @@ var commit = &Z.Cmd{
 }
 
 var add = &Z.Cmd{
-	Name:    `add`,
-	Summary: `add a command by name from file`,
-	Usage:   `<name>`,
-	MinArgs: 1,
-	Aliases: []string{"a"},
+	Name:     `add`,
+	Summary:  `add a command by name from file`,
+	Usage:    `<name>`,
+	MinArgs:  1,
+	Commands: []*Z.Cmd{help.Cmd},
+	Aliases:  []string{"a"},
 	Call: func(x *Z.Cmd, args ...string) error {
 		if err := chat.Call(x,
 			[]string{"!addcommand", args[0], "some"}...); err != nil {
@@ -96,10 +99,11 @@ var add = &Z.Cmd{
 }
 
 var remove = &Z.Cmd{
-	Name:    `remove`,
-	Summary: `remove a command with !rmcommand`,
-	Usage:   `<command>`,
-	Aliases: []string{"rm"},
+	Name:     `remove`,
+	Summary:  `remove a command with !rmcommand`,
+	Usage:    `<command>`,
+	Commands: []*Z.Cmd{help.Cmd},
+	Aliases:  []string{"rm"},
 	Call: func(x *Z.Cmd, args ...string) error {
 		if len(args) < 1 {
 			return x.UsageError()
@@ -112,11 +116,12 @@ var remove = &Z.Cmd{
 }
 
 var edit = &Z.Cmd{
-	Name:    `edit`,
-	Summary: `edit a command with !editcommand`,
-	Usage:   `<command> <msg>`,
-	MinArgs: 1,
-	Aliases: []string{"rm"},
+	Name:     `edit`,
+	Summary:  `edit a command with !editcommand`,
+	Usage:    `<command> <msg>`,
+	Commands: []*Z.Cmd{help.Cmd},
+	MinArgs:  1,
+	Aliases:  []string{"rm"},
 	Call: func(x *Z.Cmd, args ...string) error {
 		if args[0][0] != '!' {
 			args[0] = "!" + args[0]
@@ -127,14 +132,15 @@ var edit = &Z.Cmd{
 }
 
 var sync = &Z.Cmd{
-	Name:    `sync`,
-	Summary: `sync a command from YAML file to Twitch`,
-	Usage:   `<command>`,
-	MinArgs: 1,
+	Name:     `sync`,
+	Summary:  `sync a command from YAML file to Twitch`,
+	Usage:    `<command>`,
+	Commands: []*Z.Cmd{help.Cmd},
+	MinArgs:  1,
 	Call: func(x *Z.Cmd, args ...string) error {
-		path := x.Caller.C("file")
-		if path == "" {
-			return x.Caller.MissingConfig("file")
+		path, err := x.Caller.C("file")
+		if err != nil {
+			return err
 		}
 		msg, err := yq.EvaluateToString("."+args[0], path)
 		if err != nil {
@@ -148,28 +154,47 @@ var sync = &Z.Cmd{
 	},
 }
 
-var _file = &Z.Cmd{
-	Name:    `file`,
-	Params:  []string{"edit"},
-	Summary: `print the full path to commands file from configuration`,
+var filecmd = &Z.Cmd{
+	Name:     `file`,
+	Summary:  `print the full path to commands file from configuration`,
+	NoArgs:   true,
+	Commands: []*Z.Cmd{help.Cmd, fileedit},
 	Call: func(x *Z.Cmd, args ...string) error {
-		if len(args) > 0 && args[0] == "edit" {
-			file.Edit(x.Caller.C("file"))
-			return commit.Call(x, args...)
+		path, err := x.Caller.C("file")
+		if err != nil {
+			return err
 		}
-		fmt.Print(x.Caller.C("file"))
+		if !term.IsInteractive() {
+			path = strings.TrimSpace(path)
+		}
+		fmt.Print(path)
 		return nil
 	},
 }
 
-var list = &Z.Cmd{
-	Name:    `list`,
-	Summary: `list existing commands from commands.yaml`,
-	Aliases: []string{"l"},
+var fileedit = &Z.Cmd{
+	Name:     `edit`,
+	Summary:  `edit bot commands file with configured editor`,
+	NoArgs:   true,
+	Commands: []*Z.Cmd{help.Cmd},
 	Call: func(x *Z.Cmd, _ ...string) error {
-		path := x.Caller.C("file")
-		if path == "" {
-			return x.Caller.MissingConfig("file")
+		path, err := x.Caller.Caller.C("file")
+		if err != nil {
+			return err
+		}
+		return file.Edit(strings.TrimSpace(path))
+	},
+}
+
+var list = &Z.Cmd{
+	Name:     `list`,
+	Summary:  `list existing commands from commands.yaml`,
+	Aliases:  []string{"l"},
+	Commands: []*Z.Cmd{help.Cmd},
+	Call: func(x *Z.Cmd, _ ...string) error {
+		path, err := x.Caller.C("file")
+		if err != nil {
+			return err
 		}
 		buf, err := yq.EvaluateToString("keys", path)
 		if err != nil {
