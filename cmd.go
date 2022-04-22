@@ -24,6 +24,10 @@ var Cmd = &Z.Cmd{
 	Copyright: `Copyright 2021 Robert S Muhlestein`,
 	License:   `Apache-2.0`,
 	Commands:  []*Z.Cmd{help.Cmd, conf.Cmd, bot, chat},
+	Shortcuts: Z.ArgMap{
+		"project":  {"bot", "commands", "edit", "project"},
+		"commands": {"bot", "commands", "file", "edit"},
+	},
 }
 
 func sendChat(msg string) error {

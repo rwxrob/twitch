@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/mikefarah/yq/v4 v4.24.5
-	github.com/rwxrob/bonzai v0.10.1
-	github.com/rwxrob/conf v0.5.4
-	github.com/rwxrob/fs v0.5.0
-	github.com/rwxrob/help v0.3.5
+	github.com/rwxrob/bonzai v0.12.1
+	github.com/rwxrob/conf v0.6.2
+	github.com/rwxrob/fs v0.5.1
+	github.com/rwxrob/help v0.4.1
 	github.com/rwxrob/term v0.2.6
 	github.com/rwxrob/to v0.5.2
 	github.com/rwxrob/yq v0.2.4
@@ -23,7 +23,7 @@ require (
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
-	github.com/rwxrob/compcmd v0.1.5 // indirect
+	github.com/rwxrob/compcmd v0.2.1 // indirect
 	github.com/rwxrob/config v0.4.0 // indirect
 	github.com/rwxrob/fn v0.3.3 // indirect
 	github.com/rwxrob/json v0.7.0 // indirect
@@ -34,8 +34,8 @@ require (
 	github.com/timtadh/lexmachine v0.2.2 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
+	golang.org/x/net v0.0.0-20220421235706-1d1ef9303861 // indirect
+	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
 	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect

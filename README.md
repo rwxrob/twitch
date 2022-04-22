@@ -18,7 +18,7 @@ with the official `twitch` executable maintained by the Twitch company)
 Standalone
 
 ```
-go install github.com/rwxrob/twitch/twitch@latest
+go install github.com/rwxrob/twitch/cmd/twitch@latest
 ```
 
 Composed
@@ -27,7 +27,7 @@ Composed
 package cmds
 
 import (
-	"github.com/rwxrob/bonzai"
+	Z "github.com/rwxrob/bonzai/z"
 	"github.com/rwxrob/twitch"
 )
 
