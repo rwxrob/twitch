@@ -20,13 +20,13 @@ var Cmd = &Z.Cmd{
 
 	Name:      `twitch`,
 	Summary:   `collection of twitch helper commands`,
-	Version:   `v0.3.4`,
+	Version:   `v0.4.0`,
 	Copyright: `Copyright 2021 Robert S Muhlestein`,
 	License:   `Apache-2.0`,
-	Commands:  []*Z.Cmd{help.Cmd, conf.Cmd, bot, chat},
+	Commands:  []*Z.Cmd{help.Cmd, conf.Cmd, botCmd, chatCmd},
 	Shortcuts: Z.ArgMap{
-		"project":  {"bot", "commands", "edit", "project"},
-		"commands": {"bot", "commands", "file", "edit"},
+		"project": {"bot", "commands", "edit", "project"},
+		"info":    {"bot", "commands", "file", "edit"},
 	},
 }
 
@@ -34,7 +34,7 @@ func sendChat(msg string) error {
 	return Z.Exec([]string{"chat", msg}...)
 }
 
-var chat = &Z.Cmd{
+var chatCmd = &Z.Cmd{
 	Name:    `chat`,
 	Summary: `sends all arguments as a single string to Twitch chat`,
 	Call: func(_ *Z.Cmd, args ...string) error {
@@ -49,22 +49,23 @@ var chat = &Z.Cmd{
 	},
 }
 
-var bot = &Z.Cmd{
+var botCmd = &Z.Cmd{
 	Name:     `bot`,
 	Summary:  `bot-related commands`,
-	Commands: []*Z.Cmd{help.Cmd, conf.Cmd, commands},
+	Commands: []*Z.Cmd{help.Cmd, conf.Cmd, commandsCmd},
 }
 
-var commands = &Z.Cmd{
+var commandsCmd = &Z.Cmd{
 	Name:    `commands`,
 	Summary: `update and list Twitch Streamlabs Cloudbot commands`,
 	Aliases: []string{"c", "cmd"},
 	Commands: []*Z.Cmd{
-		help.Cmd, add, edit, list, remove, filecmd, sync, commit,
+		help.Cmd,
+		addCmd, editCmd, listCmd, removeCmd, fileCmd, syncCmd, commitCmd,
 	},
 }
 
-var commit = &Z.Cmd{
+var commitCmd = &Z.Cmd{
 	Name:     `commit`,
 	Summary:  `commit the commands.yaml file`,
 	Commands: []*Z.Cmd{help.Cmd},
@@ -86,7 +87,7 @@ var commit = &Z.Cmd{
 	},
 }
 
-var add = &Z.Cmd{
+var addCmd = &Z.Cmd{
 	Name:     `add`,
 	Summary:  `add a command by name from file`,
 	Usage:    `<name>`,
@@ -94,15 +95,15 @@ var add = &Z.Cmd{
 	Commands: []*Z.Cmd{help.Cmd},
 	Aliases:  []string{"a"},
 	Call: func(x *Z.Cmd, args ...string) error {
-		if err := chat.Call(x,
+		if err := chatCmd.Call(x,
 			[]string{"!addcommand", args[0], "some"}...); err != nil {
 			return err
 		}
-		return sync.Call(x, args[0])
+		return syncCmd.Call(x, args[0])
 	},
 }
 
-var remove = &Z.Cmd{
+var removeCmd = &Z.Cmd{
 	Name:     `remove`,
 	Summary:  `remove a command with !rmcommand`,
 	Usage:    `<command>`,
@@ -115,11 +116,11 @@ var remove = &Z.Cmd{
 		if args[0][0] != '!' {
 			args[0] = "!" + args[0]
 		}
-		return chat.Call(x, []string{"!rmcommand", args[0]}...)
+		return chatCmd.Call(x, []string{"!rmcommand", args[0]}...)
 	},
 }
 
-var edit = &Z.Cmd{
+var editCmd = &Z.Cmd{
 	Name:     `edit`,
 	Summary:  `edit a command with !editcommand`,
 	Usage:    `<command> <msg>`,
@@ -131,11 +132,11 @@ var edit = &Z.Cmd{
 			args[0] = "!" + args[0]
 		}
 		msg := strings.Join(args[1:], " ")
-		return chat.Call(x, []string{"!editcommand", args[0], msg}...)
+		return chatCmd.Call(x, []string{"!editcommand", args[0], msg}...)
 	},
 }
 
-var sync = &Z.Cmd{
+var syncCmd = &Z.Cmd{
 	Name:     `sync`,
 	Summary:  `sync a command from YAML file to Twitch`,
 	Usage:    `<command>`,
@@ -154,29 +155,26 @@ var sync = &Z.Cmd{
 			return fmt.Errorf("Must be 380 bytes or less (currently %v)", len(msg))
 		}
 		x.Log("Message body length: %v", len(msg))
-		return edit.Call(x, args[0], msg)
+		return editCmd.Call(x, args[0], msg)
 	},
 }
 
-var filecmd = &Z.Cmd{
+var fileCmd = &Z.Cmd{
 	Name:     `file`,
 	Summary:  `print the full path to commands file from configuration`,
 	NoArgs:   true,
-	Commands: []*Z.Cmd{help.Cmd, fileedit},
+	Commands: []*Z.Cmd{help.Cmd, fileEditCmd},
 	Call: func(x *Z.Cmd, args ...string) error {
 		path, err := x.Caller.C("file")
 		if err != nil {
 			return err
 		}
-		if !term.IsInteractive() {
-			path = strings.TrimSpace(path)
-		}
-		fmt.Print(path)
+		term.Print(path)
 		return nil
 	},
 }
 
-var fileedit = &Z.Cmd{
+var fileEditCmd = &Z.Cmd{
 	Name:     `edit`,
 	Summary:  `edit bot commands file with configured editor`,
 	NoArgs:   true,
@@ -190,7 +188,7 @@ var fileedit = &Z.Cmd{
 	},
 }
 
-var list = &Z.Cmd{
+var listCmd = &Z.Cmd{
 	Name:     `list`,
 	Summary:  `list existing commands from commands.yaml`,
 	Aliases:  []string{"l"},
