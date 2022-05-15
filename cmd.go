@@ -23,7 +23,7 @@ var Cmd = &Z.Cmd{
 	Version:   `v0.4.0`,
 	Copyright: `Copyright 2021 Robert S Muhlestein`,
 	License:   `Apache-2.0`,
-	Commands:  []*Z.Cmd{help.Cmd, conf.Cmd, botCmd, chatCmd},
+	Commands:  []*Z.Cmd{help.Cmd, conf.Cmd, botCmd, chatCmd, titleCmd},
 	Shortcuts: Z.ArgMap{
 		"project": {"bot", "commands", "edit", "project"},
 		"info":    {"bot", "commands", "file", "edit"},
@@ -46,6 +46,22 @@ var chatCmd = &Z.Cmd{
 		}
 		msg := strings.Join(args, " ")
 		return sendChat(msg)
+	},
+}
+
+func setTitle(msg string) error {
+	return sendChat(`!settitle ` + msg)
+}
+
+var titleCmd = &Z.Cmd{
+	Name:    `title`,
+	Summary: `sets the Twitch title`,
+	Call: func(_ *Z.Cmd, args ...string) error {
+		msg := strings.Join(args, " ")
+		if len(args) == 0 {
+			msg = term.Read()
+		}
+		return setTitle(msg)
 	},
 }
 
