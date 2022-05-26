@@ -13,14 +13,14 @@ import (
 	"github.com/rwxrob/help"
 	"github.com/rwxrob/term"
 	"github.com/rwxrob/to"
-	yq "github.com/rwxrob/yq/pkg"
+	"github.com/rwxrob/yq"
 )
 
 var Cmd = &Z.Cmd{
 
 	Name:      `twitch`,
 	Summary:   `collection of twitch helper commands`,
-	Version:   `v0.4.2`,
+	Version:   `v0.4.3`,
 	Copyright: `Copyright 2021 Robert S Muhlestein`,
 	License:   `Apache-2.0`,
 	Commands:  []*Z.Cmd{help.Cmd, conf.Cmd, botCmd, chatCmd, titleCmd, gameCmd},
